@@ -58,10 +58,15 @@ export class RegistroDiarioService {
      * Listagem de Registros  - /registrosDiarios (GET)
      */
     public listaRegistros (request: Request, response: Response) {
-      this.db.collection("registrosMindLaiz").orderBy("dataDeRegistro", "asc").get().then((registroSnap) => {
+      this.db.collection(`registrosMindLaiz`).orderBy("dataDeRegistro", "asc").get().then((registroSnap) => {
         const listRegistro: RegistroDiario[] = [];
         registroSnap.docs.forEach((regSnap) => {
-          listRegistro.push(RegistroDiario.toRegistroDiario(regSnap.data()));
+          var registro: RegistroDiario = RegistroDiario.toRegistroDiario(regSnap.data());
+
+          if(registro.criador?.id === request.query.idUsuario){
+            listRegistro.push(registro);
+          }
+          
         });
         HttpUtil.sucesso(listRegistro, response);
       }).catch((erro) => {
